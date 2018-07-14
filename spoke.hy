@@ -17,6 +17,17 @@
 
 (require [hy.contrib.walk [let]])
 (import [argparse [ArgumentParser]])
+(import subprocess)
+
+(defn git-add [option]
+  (setv process1 (.Popen subprocess ["git" "ls-files" option]
+                         :stdout subprocess.PIPE))
+  (setv process2 (.Popen subprocess ["xargs" "git" "add"]
+                         :stdin process1.stdout
+                         :stdout subprocess.PIPE))
+  (setv files (nth (.communicate process1) 0))
+  (.close process1.stdout)
+  files)
 
 (defn init-parser []
   (setv parser (ArgumentParser :prog "PROG"))
