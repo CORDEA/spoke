@@ -29,9 +29,14 @@
   (.close process1.stdout)
   files)
 
+(defn add [parser]
+  (cond
+    [parser.only-modified
+     (print (git-add "-m"))]))
+
 (defn init-parser []
   (setv parser (ArgumentParser :prog "PROG"))
-  (let [subparsers (.add-subparsers parser)
+  (let [subparsers (.add-subparsers parser :dest "command")
         add (.add-parser subparsers "add")]
        (.add-argument add "--only-added" :action "store_true")
        (.add-argument add "--only-unmerged" :action "store_true")
@@ -40,5 +45,7 @@
   parser)
 
 (defmain [&rest _]
-  (setv parser (init-parser))
-  (print (.parse-args parser)))
+  (setv parser (.parse-args (init-parser)))
+  (cond
+    [(= parser.command "add")
+     (add parser)]))
