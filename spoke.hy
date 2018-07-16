@@ -19,9 +19,17 @@
 (import [argparse [ArgumentParser]])
 (import subprocess)
 
+(defn git-ls-files [option]
+  (.Popen subprocess ["git" "ls-files" option] :stdout subprocess.PIPE))
+
+(defn git-show [option]
+  (setv process1 (git-ls-files option))
+  (setv files (nth (.communicate process1) 0))
+  (.close process1.stdout)
+  files)
+
 (defn git-add [option]
-  (setv process1 (.Popen subprocess ["git" "ls-files" option]
-                         :stdout subprocess.PIPE))
+  (setv process1 (git-ls-files option))
   (setv process2 (.Popen subprocess ["xargs" "git" "add"]
                          :stdin process1.stdout
                          :stdout subprocess.PIPE))
