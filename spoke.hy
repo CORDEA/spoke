@@ -40,18 +40,30 @@
   (cond
     [parser.only-modified (git-add "-m")]))
 
+(defn show [parser]
+  (cond
+    [parser.only-modified
+     (print (git-show "-m"))]))
+
+(defn add-arguments [parser]
+  (.add-argument parser "--only-added" :action "store_true")
+  (.add-argument parser "--only-unmerged" :action "store_true")
+  (.add-argument parser "--only-deleted" :action "store_true")
+  (.add-argument parser "--only-modified" :action "store_true"))
+
 (defn init-parser []
   (setv parser (ArgumentParser :prog "PROG"))
   (let [subparsers (.add-subparsers parser :dest "command")
-        add (.add-parser subparsers "add")]
-       (.add-argument add "--only-added" :action "store_true")
-       (.add-argument add "--only-unmerged" :action "store_true")
-       (.add-argument add "--only-deleted" :action "store_true")
-       (.add-argument add "--only-modified" :action "store_true"))
+        add (.add-parser subparsers "add")
+        show (.add-parser subparsers "show")]
+       (add-arguments add)
+       (add-arguments show))
   parser)
 
 (defmain [&rest _]
   (setv parser (.parse-args (init-parser)))
   (cond
     [(= parser.command "add")
-     (add parser)]))
+     (add parser)]
+    [(= parser.command "show")
+     (show parser)]))
