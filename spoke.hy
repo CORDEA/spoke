@@ -25,14 +25,12 @@
   (setv process2 (.Popen subprocess ["xargs" "git" "add"]
                          :stdin process1.stdout
                          :stdout subprocess.PIPE))
-  (setv files (nth (.communicate process1) 0))
   (.close process1.stdout)
-  files)
+  (.communicate process2))
 
 (defn add [parser]
   (cond
-    [parser.only-modified
-     (print (git-add "-m"))]))
+    [parser.only-modified (git-add "-m")]))
 
 (defn init-parser []
   (setv parser (ArgumentParser :prog "PROG"))
