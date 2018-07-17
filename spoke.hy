@@ -36,19 +36,18 @@
   (.close process1.stdout)
   (.communicate process2))
 
-(defn add [parser]
+(defn exec-with-argument [command parser]
   (cond
-    [parser.only-added (git-add "-o" "--exclude-standard")]
-    [parser.only-modified (git-add "-m")]
-    [parser.only-deleted (git-add "-d")]
-    [parser.only-unmerged (git-add "-u")]))
+    [parser.only-added (command "-o" "--exclude-standard")]
+    [parser.only-modified (command "-m")]
+    [parser.only-deleted (command "-d")]
+    [parser.only-unmerged (command "-u")]))
+
+(defn add [parser]
+  (exec-with-argument git-add parser))
 
 (defn show [parser]
-  (cond
-    [parser.only-added (print (git-show "-o" "--exclude-standard"))]
-    [parser.only-modified (print (git-show "-m"))]
-    [parser.only-deleted (print (git-show "-d"))]
-    [parser.only-unmerged (print (git-show "-u"))]))
+  (print (exec-with-argument git-show parser)))
 
 (defn add-arguments [parser]
   (.add-argument parser "--only-added" :action "store_true")
