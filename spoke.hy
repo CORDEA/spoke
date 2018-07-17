@@ -20,15 +20,15 @@
 (import subprocess)
 
 (defn git-ls-files [option]
-  (.Popen subprocess ["git" "ls-files" option] :stdout subprocess.PIPE))
+  (.Popen subprocess (flatten ["git" "ls-files" option]) :stdout subprocess.PIPE))
 
-(defn git-show [option]
+(defn git-show [&rest option]
   (setv process1 (git-ls-files option))
   (setv files (nth (.communicate process1) 0))
   (.close process1.stdout)
   files)
 
-(defn git-add [option]
+(defn git-add [&rest option]
   (setv process1 (git-ls-files option))
   (setv process2 (.Popen subprocess ["xargs" "git" "add"]
                          :stdin process1.stdout
@@ -38,12 +38,14 @@
 
 (defn add [parser]
   (cond
+    [parser.only-added (git-add "-o" "--exclude-standard")]
     [parser.only-modified (git-add "-m")]
     [parser.only-deleted (git-add "-d")]
     [parser.only-unmerged (git-add "-u")]))
 
 (defn show [parser]
   (cond
+    [parser.only-added (print (git-show "-o" "--exclude-standard"))]
     [parser.only-modified (print (git-show "-m"))]
     [parser.only-deleted (print (git-show "-d"))]
     [parser.only-unmerged (print (git-show "-u"))]))
