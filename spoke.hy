@@ -38,12 +38,15 @@
 
 (defn add [parser]
   (cond
-    [parser.only-modified (git-add "-m")]))
+    [parser.only-modified (git-add "-m")]
+    [parser.only-deleted (git-add "-d")]
+    [parser.only-unmerged (git-add "-u")]))
 
 (defn show [parser]
   (cond
-    [parser.only-modified
-     (print (git-show "-m"))]))
+    [parser.only-modified (print (git-show "-m"))]
+    [parser.only-deleted (print (git-show "-d"))]
+    [parser.only-unmerged (print (git-show "-u"))]))
 
 (defn add-arguments [parser]
   (.add-argument parser "--only-added" :action "store_true")
